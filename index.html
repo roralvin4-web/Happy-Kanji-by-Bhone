@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>漢字喫茶 - Cozy Kanji Café</title>
+    <style>
+        :root {
+            --cafe-bg: #f4eee2;
+            --cafe-card: #ffffff;
+            --cafe-wood: #5c4033;
+            --cafe-accent: #8b5a2b;
+            --cafe-text: #2f2e2e;
+            --cafe-gold: #d4a373;
+            --counter-bg: linear-gradient(135deg, #e9edc9 0%, #ccd5ae 100%);
+        }
+
+        body.theme-sakura {
+            --cafe-bg: #ffe5ec;
+            --cafe-card: #ffffff;
+            --cafe-wood: #6b2d5c;
+            --cafe-accent: #ffb703;
+            --counter-bg: linear-gradient(135deg, #ffcad4 0%, #ffb5a7 100%);
+        }
+
+        body.theme-rainy {
+            --cafe-bg: #d8e2dc;
+            --cafe-card: #f8f9fa;
+            --cafe-wood: #2b2d42;
+            --cafe-accent: #4a4e69;
+            --counter-bg: linear-gradient(135deg, #94d2bd 0%, #e9d8a6 100%);
+        }
+
+        body.theme-autumn {
+            --cafe-bg: #fdf0ed;
+            --cafe-card: #ffffff;
+            --cafe-wood: #9e2a2b;
+            --cafe-accent: #e07a5f;
+            --counter-bg: linear-gradient(135deg, #f4a261 0%, #e76f51 100%);
+        }
+
+        body.theme-night {
+            --cafe-bg: #1d2d44;
+            --cafe-card: #0d1b2a;
+            --cafe-wood: #f4a261;
+            --cafe-text: #e0e1dd;
+            --cafe-gold: #e07a5f;
+            --counter-bg: linear-gradient(135deg, #415a77 0%, #1b263b 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 10px;
+            background-color: var(--cafe-bg);
+            color: var(--cafe-text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            transition: background-color 0.4s ease;
+        }
+
+        #game-box {
+            width: 100%;
+            max-width: 480px;
+            background: var(--cafe-card);
+            border: 4px solid var(--cafe-wood);
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+            position: relative;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed rgba(212, 163, 115, 0.5);
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 18px;
+            color: var(--cafe-wood);
+        }
+
+        .header-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .icon-btn {
+            background: var(--cafe-accent);
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(250, 237, 205, 0.6);
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--cafe-wood);
+        }
+
+        .theme-bar {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 12px;
+        }
+
+        .theme-btn {
+            background: transparent;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .theme-btn.active {
+            background: var(--cafe-card);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+
+        .shop-counter {
+            position: relative;
+            height: 160px;
+            background: var(--counter-bg);
+            border-radius: 12px;
+            border: 2px solid var(--cafe-gold);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 12px;
+            text-align: center;
+            transition: background 0.4s ease;
+        }
+
+        .customer-avatar {
+            font-size: 45px;
+            margin-bottom: 5px;
+            animation: bounce 1.5s infinite alternate;
+        }
+
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-5px); }
+        }
+
+        .order-bubble {
+            background: var(--cafe-card);
+            color: var(--cafe-text);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border: 1px solid var(--cafe-gold);
+            max-width: 90%;
+        }
+
+        .order-kanji {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--cafe-wood);
+            letter-spacing: 2px;
+            margin: 2px 0;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .btn-opt {
+            background: var(--cafe-card);
+            color: var(--cafe-text);
+            border: 2px solid var(--cafe-gold);
+            padding: 12px 8px;
+            font-size: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.1s;
+        }
+
+        .btn-opt:active {
+            transform: scale(0.96);
+            background: var(--cafe-gold);
+            color: white;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(0,0,0,0.08);
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--cafe-wood);
+        }
+
+        .filter-btn.active {
+            background: var(--cafe-wood);
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(20, 20, 20, 0.95);
+            border-radius: 20px;
+            padding: 15px;
+            z-index: 10;
+            overflow-y: auto;
+            color: white;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--cafe-gold);
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+
+        .dict-search {
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid var(--cafe-gold);
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .vocab-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 4px;
+            border-bottom: 1px dashed rgba(255,255,255,0.15);
+            font-size: 13px;
+        }
+
+        .vocab-badge {
+            background: var(--cafe-gold);
+            color: #2f2e2e;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .close-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .hint-box {
+            background: var(--cafe-card);
+            color: var(--cafe-text);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            border: 3px solid var(--cafe-gold);
+            text-align: center;
+        }
+
+        .hint-kanji {
+            font-size: 40px;
+            color: var(--cafe-wood);
+            font-weight: bold;
+        }
+
+        .hint-decomp {
+            background: rgba(0,0,0,0.05);
+            padding: 6px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin: 8px 0;
+            color: var(--cafe-accent);
+            font-weight: bold;
+        }
+
+        .hint-story {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-box">
+    <header>
+        <h1>☕ 漢字喫茶 (Kanji Café)</h1>
+        <div class="header-btns">
+            <button class="icon-btn" onclick="toggleDict()">📖 စာအုပ်စင် (<span id="total-dict-count">0</span>)</button>
+        </div>
+    </header>
+
+    <div class="theme-bar">
+        <button class="theme-btn active" title="Default Cozy" onclick="changeTheme('default', this)">☕ Cozy</button>
+        <button class="theme-btn" title="Sakura Spring" onclick="changeTheme('sakura', this)">🌸 Sakura</button>
+        <button class="theme-btn" title="Rainy Day" onclick="changeTheme('rainy', this)">🌧️ Rainy</button>
+        <button class="theme-btn" title="Autumn Tea House" onclick="changeTheme('autumn', this)">🍂 Autumn</button>
+        <button class="theme-btn" title="Cozy Night" onclick="changeTheme('night', this)">🌙 Night</button>
+    </div>
+
+    <div class="stats-bar">
+        <span>🪙 ငွေပြား: <strong id="coin-val" style="color: #b5838d;">0</strong></span>
+        <span>⭐ အမှတ်: <strong id="score-val" style="color: #e09f3e;">0</strong></span>
+        <span>☕ အဆင့်: <span id="level-name">အစပြုဆိုင်</span></span>
+    </div>
+
+    <div class="mode-selector">
+        <button class="filter-btn active" onclick="setFilter('ALL')">အားလုံး</button>
+        <button class="filter-btn" onclick="setFilter('N5')">N5</button>
+        <button class="filter-btn" onclick="setFilter('N4')">N4</button>
+        <button class="filter-btn" onclick="setFilter('SINGLE')">တစ်လုံးချင်း</button>
+        <button class="filter-btn" onclick="setFilter('JUKUGO')">တွဲလုံးများ</button>
+    </div>
+
+    <div class="shop-counter">
+        <div class="customer-avatar" id="cust-avatar">🦊</div>
+        <div class="order-bubble">
+            <span id="order-text">ဒီ မီနူးလေး လိုချင်ပါတယ်:</span>
+            <div id="kanji-display" class="order-kanji">準備中...</div>
+        </div>
+    </div>
+
+    <div class="options-grid" id="options-box"></div>
+
+    <!-- Mnemonic Hint Modal -->
+    <div id="hint-modal" class="modal">
+        <div class="modal-header">
+            <span>💡 အလွယ်မှတ်နည်း အကွက်</span>
+            <button class="close-btn" onclick="closeHint()">ဆက်လုပ်မည်</button>
+        </div>
+        <div class="hint-box">
+            <div class="hint-kanji" id="hint-k-display">山</div>
+            <div id="hint-reading" style="font-weight: bold; color: var(--cafe-wood);">[やま] - တောင်</div>
+            <div class="hint-decomp" id="hint-decomp-text">ခွဲခြားပုံ: ｜ + 𠁁</div>
+            <div class="hint-story" id="hint-story-text">မှတ်နည်း: တောင်ထွတ် ၃ ခု ထောင်ထွက်နေသော ပုံစံမှ ဆင်းသက်လာသည်။</div>
+        </div>
+    </div>
+
+    <!-- Expanded Dictionary Modal -->
+    <div id="dict-modal" class="modal">
+        <div class="modal-header">
+            <span>📚 N5 & N4 စာအုပ်စင် အပြည့်အစုံ</span>
+            <button class="close-btn" onclick="toggleDict()">ပိတ်မည်</button>
+        </div>
+        <input type="text" class="dict-search" id="dict-search-input" placeholder="ခန်းဂျီး၊ အသံထွက် သို့မဟုတ် အဓိပ္ပာယ် ရှာရန်..." oninput="renderDict()">
+        <div id="dict-list"></div>
+    </div>
+</div>
+
+<script>
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(type) {
+        if(ctx.state === 'suspended') ctx.resume();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if(type === 'coin') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.2, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+            osc.start(); osc.stop(ctx.currentTime + 0.15);
+        } else if(type === 'error') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, ctx.currentTime);
+            osc.frequency.linearRampToValueAtTime(80, ctx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.2, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+            osc.start(); osc.stop(ctx.currentTime + 0.2);
+        }
+    }
+
+    function changeTheme(themeName, btn) {
+        document.body.className = '';
+        if(themeName !== 'default') {
+            document.body.classList.add('theme-' + themeName);
+        }
+        document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    // Comprehensive Master Database: N5 (Lessons 1-11) & N4 (Lessons 1-20)
+    const masterDb = [
+        // --- N5 Single Kanji (Expanded Dataset) ---
+        { k: "山", r: "やま", m: "တောင်", l: "N5", type: "SINGLE", decomp: "｜ + 𠁁", story: "တောင်ထွတ် ၃ ခု ထောင်ထွက်နေသော ပုံစံ။" },
+        { k: "川", r: "かわ", m: "မြစ်", l: "N5", type: "SINGLE", decomp: "丨 + 丨 + 丨", story: "မြစ်ရေ စီးဆင်းနေသည့် လိုင်းကြောင်းများ။" },
+        { k: "田", r: "た", m: "စပါးစိုက်ခင်း", l: "N5", type: "SINGLE", decomp: "口 + 十", story: "စတုရန်းကွက် လေးကွက် ခွဲထားသည့် လယ်ကွက်။" },
+        { k: "日", r: "ひ / にち", m: "နေ / နေ့", l: "N5", type: "SINGLE", decomp: "口 + 一", story: "ဝိုင်းစက်သော နေလုံးကြီး အလယ်တွင် အလင်းတန်း ပါသည့် ပုံစံ။" },
+        { k: "月", r: "つき", m: "လ", l: "N5", type: "SINGLE", decomp: "လခြမ်းပုံစံ", story: "ကောင်းကင်တွင် သာနေသော လခြမ်းကွေးလေး။" },
+        { k: "火", r: "ひ", m: "မီး", l: "N5", type: "SINGLE", decomp: "人 + 💡", story: "မီးပုံကြီးမှ မီးပွားများ ဘေးသို့ ထွက်နေသည့် ပုံစံ။" },
+        { k: "水", r: "みず", m: "ရေ", l: "N5", type: "SINGLE", decomp: "亅 + ⺡", story: "ရေစက် ရေပေါက်များ ဘေးသို့ စင်ထွက်နေသည့် ပုံ။" },
+        { k: "木", r: "き", m: "သစ်ပင်", l: "N5", type: "SINGLE", decomp: "十 + 八", story: "သစ်ပင်၏ ပင်စည်နှင့် အကိုင်းအခက်များ။" },
+        { k: "金", r: "かね", m: "ရွှေ / ပိုက်ဆံ", l: "N5", type: "SINGLE", decomp: "人 + 王 + 💡", story: "မြေကြီးအောက်တွင် တောက်ပနေသော ရွှေတုံးများ။" },
+        { k: "土", r: "つち", m: "မြေကြီး", l: "N5", type: "SINGLE", decomp: "十 + 一", story: "မြေပြင်ပေါ်တွင် အပင်ပေါက်လေး စတင်ထွက်ပြူလာသည့် ပုံ။" },
+        { k: "一", r: "ひとつ / いち", m: "တစ်", l: "N5", type: "SINGLE", decomp: "一", story: "လက်ညှိုးတစ်ချောင်း တလျက်တည်း ဆွဲထားသည့် ပုံ။" },
+        { k: "二", r: "ふたつ / に", m: "နှစ်", l: "N5", type: "SINGLE", decomp: "二", story: "လက်ညှိုးနှစ်ချောင်း တပြိုင်နက် ပုံစံ။" },
+        { k: "三", r: "みっつ / さん", m: "သုံး", l: "N5", type: "SINGLE", decomp: "三", story: "မျဉ်းပြိုင် ၃ ကြောင်း။" },
+        { k: "四", r: "よん / し", m: "လေး", l: "N5", type: "SINGLE", decomp: "口 + 儿", story: "စတုရန်းကွက်ထဲတွင် ခြေထောက်နှစ်ချောင်း။" },
+        { k: "五", r: "いつつ / ご", m: "ငါး", l: "N5", type: "SINGLE", decomp: "五", story: "လက်ဝါးအကန့်များ။" },
+        { k: "六", r: "むっつ / ろく", m: "ခြောက်", l: "N5", type: "SINGLE", decomp: "亠 + 八", story: "ခေါင်းဆောင်းနှင့် အောက်ခြေ။" },
+        { k: "七", r: "なな / しち", m: "ခုနစ်", l: "N5", type: "SINGLE", decomp: "七", story: "ဓါးမြှောင်ပြောင်းပြန် ပုံစံ။" },
+        { k: "八", r: "やっつ / はち", m: "ရှစ်", l: "N5", type: "SINGLE", decomp: "八", story: "အောက်သို့ ကားထွက်သွားသော လိုင်းနှစ်ကြောင်း။" },
+        { k: "九", r: "ここのつ / きゅう", m: "ကိုး", l: "N5", type: "SINGLE", decomp: "九", story: "ကွေးကွေးလေး ပုံစံ။" },
+        { k: "十", r: "とお / じゅう", m: "တစ်ဆယ်", l: "N5", type: "SINGLE", decomp: "十", story: "ကြက်ခြေခတ် ပုံစံ။" },
+        { k: "百", r: "ひゃく", m: "တစ်ရာ", l: "N5", type: "SINGLE", decomp: "一 + 白", story: "အဖြူရောင်ပေါ်တွင် တစ်ရာတန်။" },
+        { k: "千", r: "せん", m: "တစ်ထောင်", l: "N5", type: "SINGLE", decomp: "丿 + 十", story: "တစ်ဆယ်ထက် အဆတစ်ရာ ပိုများသော အရာ။" },
+        { k: "万", r: "まん", m: "တစ်သောင်း", l: "N5", type: "SINGLE", decomp: "一 + 勹", story: "ကြီးမားသော ပမာဏ။" },
+        { k: "円", r: "えん", m: "ယန်း / စက်ဝိုင်း", l: "N5", type: "SINGLE", decomp: "冂 + 💬", story: "ဂျပန် ငွေကြေး ပမာဏ။" },
+        { k: "年", r: "とし / ねん", m: "နှစ်", l: "N5", type: "SINGLE", decomp: "午 + 一", story: "စပါးရိတ်သိမ်းချိန် တစ်နှစ်တာ။" },
+        { k: "上", r: "うえ", m: "အပေါ်", l: "N5", type: "SINGLE", decomp: "ト + 一", story: "မျဉ်းကြောင်း၏ အပေါ်သို့ ထောက်ပြနေသည့် ပုံ။" },
+        { k: "下", r: "した", m: "အောက်", l: "N5", type: "SINGLE", decomp: "一 + 𠁁", story: "မျဉ်းကြောင်း၏ အောက်သို့ ညွှန်ပြနေသည့် ပုံ။" },
+        { k: "中", r: "なか", m: "အလယ်", l: "N5", type: "SINGLE", decomp: "口 + 丨", story: "စတုရန်းကွက်၏ အလယ်တည့်တည့်ကို ဖောက်ထွင်းထားသော လိုင်း။" },
+        { k: "半", r: "はん", m: "တစ်ဝက်", l: "N5", type: "SINGLE", decomp: "丷 + 十", story: "အရာတစ်ခုကို ထက်ဝက်တိတိ ပိုင်းခြားထားခြင်း။" },
+        { k: "分", r: "ふん / ぶん", m: "မိနစ် / ပိုင်းခြားခြင်း", l: "N5", type: "SINGLE", decomp: "八 + 刀", story: "ဓားဖြင့် အပိုင်းပိုင်း ခုတ်ပိုင်းထားခြင်း။" },
+        { k: "人", r: "ひと", m: "လူ", l: "N5", type: "SINGLE", decomp: "ခြေထောက် ၂ ချောင်း", story: "လမ်းလျှောက်နေသော လူ။" },
+        { k: "子", r: "こ", m: "ကလေး", l: "N5", type: "SINGLE", decomp: "了 + 一", story: "အနှီးထုပ်ထားသော ကလေးငယ်။" },
+        { k: "女", r: "おんな", m: "မိန်းမ", l: "N5", type: "SINGLE", decomp: "ခြေဆင်းထိုင်နေသော ပုံ", story: "ယဉ်ကျေးစွာ ထိုင်နေသည့် အမျိုးသမီး။" },
+        { k: "男", r: "おとこ", m: "ယောက်ျား", l: "N5", type: "SINGLE", decomp: "田 + 力", story: "လယ်ကွက်တွင် ခွန်အား စိုက်ထုတ်သူ။" },
+        { k: "目", r: "め", m: "မျက်စိ", l: "N5", type: "SINGLE", decomp: "မျက်လုံးပုံစံ", story: "မျက်လုံး၏ သူငယ်အိမ် ပုံရိပ်။" },
+        { k: "口", r: "くち", m: "ပါးစပ်", l: "N5", type: "SINGLE", decomp: "စတုရန်းကွက်", story: "ဟထားသော ပါးစပ်ပုံစံ။" },
+        { k: "耳", r: "みみ", m: "နား", l: "N5", type: "SINGLE", decomp: "နားရွက်ပုံစံ", story: "အသံနားထောင်သည့် နားရွက်။" },
+        { k: "手", r: "て", m: "လက်", l: "N5", type: "SINGLE", decomp: "လက်ဝါးပုံစံ", story: "လက်ချောင်းများ ဖြန့်ကားထားသည့် လက်ဝါး။" },
+        { k: "足", r: "あし", m: "ခြေထောက်", l: "N5", type: "SINGLE", decomp: "口 + 止", story: "လမ်းလျှောက်သည့် ခြေထောက်။" },
+        { k: "力", r: "ちから", m: "အား", l: "N5", type: "SINGLE", decomp: "ထွန်တုံးပုံစံ", story: "ကြွက်သား ခွန်အား။" },
+        { k: "父", r: "ちち", m: "အဖေ", l: "N5", type: "SINGLE", decomp: "八 + 乂", story: "တုတ်ကောက် ကိုင်ထားသော အဖေ။" },
+        { k: "母", r: "はは", m: "အမေ", l: "N5", type: "SINGLE", decomp: "女 + 💡", story: "ရင်သွေးကို နို့တိုက်နေသော အမေ။" },
+        { k: "先", r: "さき", m: "ရှေ့ / အရင်", l: "N5", type: "SINGLE", decomp: "牛 + 儿", story: "ရှေ့မှ ဦးဆောင်သွားသူ။" },
+        { k: "生", r: "うまれる / せい", m: "မွေးဖွားသည် / သက်ရှိ", l: "N5", type: "SINGLE", decomp: "𠂉 + 土", story: "မြေကြီးမှ အပင်ပေါက်လေး ထွက်လာခြင်း။" },
+        { k: "学", r: "まなぶ", m: "သင်ယူသည်", l: "N5", type: "SINGLE", decomp: "⺌ + 子", story: "ကျောင်းမိုးအောက်တွင် စာသင်နေသော ကလေး။" },
+        { k: "校", r: "こう", m: "ကျောင်း", l: "N5", type: "SINGLE", decomp: "木 + 交", story: "သစ်သားဖြင့် ဆောက်ထားသော ကျောင်း။" },
+        { k: "友", r: "とも", m: "သူငယ်ချင်း", l: "N5", type: "SINGLE", decomp: "ナ + 又", story: "လက်ချင်း ဆုပ်ကိုင်ထားကြသော သူငယ်ချင်းများ။" },
+        { k: "本", r: "ほん", m: "စာအုပ် / အခြေခံ", l: "N5", type: "SINGLE", decomp: "木 + 一", story: "သစ်ပင်၏ အမြစ် / စာအုပ်။" },
+        { k: "毎", r: "まい", m: "တိုင်း", l: "N5", type: "SINGLE", decomp: "人 + 母", story: "အမေတိုင်း။" },
+        { k: "何", r: "なに / なん", m: "ဘာလဲ", l: "N5", type: "SINGLE", decomp: "亻 + 可", story: "လူတစ်ယောက် ထမ်းပိုး ထမ်းထားသည့် ပုံစံ။" },
+        { k: "前", r: "まえ", m: "ရှေ့", l: "N5", type: "SINGLE", decomp: "䒑 + 月 + 刂", story: "ရှေ့တည့်တည့် နေရာ။" },
+        { k: "後", r: "うしろ / あと", m: "နောက်", l: "N5", type: "SINGLE", decomp: "彳 + 幺 + 夂", story: "နောက်မှ လိုက်လာခြင်း။" },
+        { k: "外", r: "そと", m: "အပြင်", l: "N5", type: "SINGLE", decomp: "夕 + 卜", story: "ညနေခင်း အပြင်ထွက်ခြင်း။" },
+        { k: "左", r: "ひだり", m: "ဘယ်ဘက်", l: "N5", type: "SINGLE", decomp: "ナ + 工", story: "ဘယ်လက်ဖြင့် ပေတံကို ကိုင်ထားခြင်း။" },
+        { k: "右", r: "みぎ", m: "ညာဘက်", l: "N5", type: "SINGLE", decomp: "ナ + 口", story: "ညာလက်ဖြင့် ထမင်းစားရန် ပါးစပ်ဆီ ပို့ခြင်း။" },
+
+        // --- N5 Jukugo (Expanded Dataset) ---
+        { k: "山川", r: "やまかわ", m: "တောင်နှင့်မြစ်", l: "N5", type: "JUKUGO", decomp: "山 + 川", story: "သဘာဝ တောင်နှင့် မြစ်။" },
+        { k: "火山", r: "かざん", m: "မီးတောင်", l: "N5", type: "JUKUGO", decomp: "火 + 山", story: "မီးများ ထွက်နေသော တောင်။" },
+        { k: "水田", r: "すいでん", m: "စပါးစိုက်ခင်း", l: "N5", type: "JUKUGO", decomp: "水 + 田", story: "ရေသွင်းထားသော လယ်ကွက်။" },
+        { k: "百万", r: "ひゃくまん", m: "တစ်သန်း", l: "N5", type: "JUKUGO", decomp: "百 + 万", story: "တစ်ရာ x သောင်း = တစ်သန်း။" },
+        { k: "上下", r: "じょうげ", m: "အပေါ်အောက်", l: "N5", type: "JUKUGO", decomp: "上 + 下", story: "အနိမ့်အမြင့်။" },
+        { k: "半分", r: "はんぶん", m: "တစ်ဝက်", l: "N5", type: "JUKUGO", decomp: "半 + 分", story: "ထက်ဝက် အပိုင်း။" },
+        { k: "先生", r: "せんせい", m: "ဆရာ / ဆရာမ", l: "N5", type: "JUKUGO", decomp: "先 + 生", story: "ရှေ့မှ သင်ကြားပေးသူ။" },
+        { k: "学校", r: "がっこう", m: "ကျောင်း", l: "N5", type: "JUKUGO", decomp: "学 + 校", story: "ပညာသင်ကြားရာ နေရာ။" },
+        { k: "友人", r: "ゆうじん", m: "သူငယ်ချင်း", l: "N5", type: "JUKUGO", decomp: "友 + 人", story: "ခင်မင်ရသော မိတ်ဆွေ။" },
+        { k: "毎日", r: "まいにち", m: "နေ့တိုင်း", l: "N5", type: "JUKUGO", decomp: "毎 + 日", story: "ရက်စဉ် စွဲမြဲစွာ။" },
+        { k: "前後", r: "ぜんご", m: "ရှေ့နောက်", l: "N5", type: "JUKUGO", decomp: "前 + 後", story: "ရှေ့နှင့် နောက်။" },
+        { k: "左右", r: "さゆう", m: "ဘယ်ညာ", l: "N5", type: "JUKUGO", decomp: "左 + 右", story: "ဘယ်ဘက်နှင့် ညာဘက်။" },
+        { k: "天気", r: "てんき", m: "ရာသီဥတု", l: "N5", type: "JUKUGO", decomp: "天 + 気", story: "ကောင်းကင်၏ ခြေအနေ။" },
+        { k: "電車", r: "でんしゃ", m: "ရထား", l: "N5", type: "JUKUGO", decomp: "電 + 車", story: "လျှပ်စစ်ရထား။" },
+
+        // --- N4 Single & Jukugo (Expanded Dataset) ---
+        { k: "住", r: "すむ", m: "နေထိုင်သည်", l: "N4", type: "SINGLE", decomp: "亻 + 主", story: "လူတစ်ယောက် အိမ်တွင် မှီတင်းနေထိုင်ခြင်း။" },
+        { k: "所", r: "ところ", m: "နေရာ", l: "N4", type: "SINGLE", decomp: "戶 + 斤", story: "တံခါးနှင့် ပုဆိန်ရှိသော နေရာ။" },
+        { k: "京", r: "きょう", m: "မြို့တော်", l: "N4", type: "SINGLE", decomp: "亠 + 口 + 小", story: "မြင့်မားသော မြို့ရိုးကြီး။" },
+        { k: "都", r: "みやこ", m: "မြို့ကြီး", l: "N4", type: "SINGLE", decomp: "者 + ⻌", story: "လူများစွာ စုဝေးရာ မြို့ကြီး။" },
+        { k: "明", r: "あかるい", m: "လင်းသော", l: "N4", type: "SINGLE", decomp: "日 + 月", story: "နေနှင့် လ ပေါင်းစပ်၍ အလင်းရောင် ရရှိခြင်း။" },
+        { k: "暗", r: "くらい", m: "မှောင်သော", l: "N4", type: "SINGLE", decomp: "日 + 音", story: "နေရောင် မရှိဘဲ မှောင်မိုက်နေခြင်း။" },
+        { k: "遠", r: "とおい", m: "ဝေးသော", l: "N4", type: "SINGLE", decomp: "⻌ + 袁", story: "အဝေးသို့ လမ်းလျှောက်သွားခြင်း။" },
+        { k: "近", r: "ちかい", m: "နီးသော", l: "N4", type: "SINGLE", decomp: "⻌ + 斤", story: "နီးနီးလေး နေရာ။" },
+        { k: "強", r: "つよい", m: "သန်မာသော", l: "N4", type: "SINGLE", decomp: "弓 + 厶 + 虫", story: "လေးအလား သန်မာသော အင်အား။" },
+        { k: "弱", r: "よわい", m: "အားနည်းသော", l: "N4", type: "SINGLE", decomp: "弓 + 弓 + 冫", story: "ကျိုးပဲ့လွယ်သော အားနည်းချက်။" },
+        { k: "住所", r: "じゅうしょ", m: "လိပ်စာ", l: "N4", type: "JUKUGO", decomp: "住 + 所", story: "နေထိုင်ရာ နေရာ လိပ်စာ။" },
+        { k: "京都", r: "きょうと", m: "ကျိုတိုမြို့", l: "N4", type: "JUKUGO", decomp: "京 + 都", story: "ဂျပန် ရှေးဟောင်း မြို့တော်။" },
+        { k: "市長", r: "しちょう", m: "မြို့တော်ဝန်", l: "N4", type: "JUKUGO", decomp: "市 + 長", story: "မြို့၏ အကြီးအကဲ။" },
+        { k: "特別", r: "とくべつ", m: "အထူး", l: "N4", type: "JUKUGO", decomp: "特 + 別", story: "သီးသန့် အထူး။" },
+        { k: "便利", r: "べんり", m: "အဆင်ပြေသော", l: "N4", type: "JUKUGO", decomp: "便 + 利", story: "သုံးရတာ လွယ်ကူသော။" },
+        { k: "映画", r: "えいが", m: "ရုပ်ရှင်", l: "N4", type: "JUKUGO", decomp: "映 + 画", story: "ပိတ်ကားပေါ်မှ ရုပ်ရှင်။" },
+        { k: "音楽", r: "おんがく", m: "ဂီတ / သီချင်း", l: "N4", type: "JUKUGO", decomp: "音 + 楽", story: "သာယာသော အသံ။" },
+        { k: "写真", r: "しゃしん", m: "ဓာတ်ပုံ", l: "N4", type: "JUKUGO", decomp: "写 + 真", story: "ရိုက်ကူးထားသော ပုံ။" },
+        { k: "旅行", r: "りょこう", m: "ခရီးသွားခြင်း", l: "N4", type: "JUKUGO", decomp: "旅 + 行", story: "အဝေး ခရီးထွက်ခြင်း။" },
+        { k: "銀行", r: "ぎんこう", m: "ဘဏ်", l: "N4", type: "JUKUGO", decomp: "銀 + 行", story: "ငွေစုဆောင်းရာ ဘဏ်။" },
+        { k: "台風", r: "たいふう", m: "မုန်တိုင်း", l: "N4", type: "JUKUGO", decomp: "台 + 風", story: "ပြင်းထန်သော လေမုန်တိုင်း။" },
+        { k: "頭痛", r: "ずつう", m: "ခေါင်းကိုက်ခြင်း", l: "N4", type: "JUKUGO", decomp: "頭 + 痛", story: "ခေါင်းခဲ ရောဂါ။" },
+        { k: "病院", r: "びょういん", m: "ဆေးရုံ", l: "N4", type: "JUKUGO", decomp: "病 + 院", story: "ကုသရေး ဆေးရုံ။" },
+        { k: "時計", r: "とけい", m: "နာရီ", l: "N4", type: "JUKUGO", decomp: "時 + 計", story: "အချိန်ကြည့် နာရီ။" },
+        { k: "散歩", r: "さんぽ", m: "လမ်းလျှောက်ခြင်း", l: "N4", type: "JUKUGO", decomp: "散 + 歩", story: "အေးဆေး လမ်းလျှောက်ခြင်း။" },
+        { k: "兄弟", r: "きょうだい", m: "ညီအစ်ကို မောင်နှမ", l: "N4", type: "JUKUGO", decomp: "兄 + 弟", story: "မိသားစုဝင် ညီအစ်ကို။" },
+        { k: "料理", r: "りょうり", m: "ဟင်းချက်ခြင်း", l: "N4", type: "JUKUGO", decomp: "料 + 理", story: "အစားအသောက် ပြင်ဆင်ခြင်း။" },
+        { k: "注意", r: "ちゅうい", m: "သတိပြုခြင်း", l: "N4", type: "JUKUGO", decomp: "注 + 意", story: "ဂရုစိုက်ခြင်း။" },
+        { k: "図書館", r: "としょかん", m: "စာကြည့်တိုက်", l: "N4", type: "JUKUGO", decomp: "図 + 書 + 館", story: "စာအုပ်များ ထားရှိရာ။" },
+        { k: "交通", r: "こうつう", m: "သယ်ယူပို့ဆောင်ရေး", l: "N4", type: "JUKUGO", decomp: "交 + 通", story: "လမ်းပန်း ဆက်သွယ်ရေး။" },
+        { k: "漢字", r: "かんじ", m: "ခန်းဂျီး", l: "N4", type: "JUKUGO", decomp: "漢 + 字", story: "တရုတ် စာလုံးများ။" },
+        { k: "勉強", r: "べんきょう", m: "စာလေ့လာခြင်း", l: "N4", type: "JUKUGO", decomp: "勉 + 強", story: "ကြိုးစား လေ့လာခြင်း။" },
+        { k: "試験", r: "しけん", m: "စာမေးပွဲ", l: "N4", type: "JUKUGO", decomp: "試 + 験", story: "စမ်းသပ် စာမေးပွဲ။" },
+        { k: "質問", r: "しつもん", m: "မေးခွန်း", l: "N4", type: "JUKUGO", decomp: "質 + 問", story: "သိရှိလိုသည်များကို မေးမြန်းခြင်း။" },
+        { k: "説明", r: "せつめい", m: "ရှင်းလင်းချက်", l: "N4", type: "JUKUGO", decomp: "説 + 明", story: "နားလည်အောင် ရှင်းပြခြင်း။" }
+    ];
+
+    const customers = ["🦊", "🐼", "🐨", "🐰", "🐱", "🐻", "🐸", "🐯"];
+    let currentFilter = 'ALL';
+    let coins = 0;
+    let score = 0;
+    let curTarget = {};
+    let sessionQueue = [];
+
+    function setFilter(filter) {
+        currentFilter = filter;
+        sessionQueue = [];
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+        nextCustomer();
+    }
+
+    function getFilteredPool() {
+        return masterDb.filter(item => {
+            if (currentFilter === 'ALL') return true;
+            if (currentFilter === 'N5') return item.l === 'N5';
+            if (currentFilter === 'N4') return item.l === 'N4';
+            if (currentFilter === 'SINGLE') return item.type === 'SINGLE';
+            if (currentFilter === 'JUKUGO') return item.type === 'JUKUGO';
+            return true;
+        });
+    }
+
+    function nextCustomer() {
+        const pool = getFilteredPool();
+        if(pool.length === 0) return;
+
+        if(sessionQueue.length === 0) {
+            sessionQueue = [...pool];
+            sessionQueue.sort(() => Math.random() - 0.5);
+        }
+
+        curTarget = sessionQueue.pop();
+        
+        document.getElementById('cust-avatar').innerText = customers[Math.floor(Math.random() * customers.length)];
+        document.getElementById('kanji-display').innerText = curTarget.k;
+
+        let choices = [curTarget];
+        while(choices.length < 4 && choices.length < pool.length) {
+            let r = pool[Math.floor(Math.random() * pool.length)];
+            if(!choices.includes(r)) choices.push(r);
+        }
+        choices.sort(() => Math.random() - 0.5);
+
+        const box = document.getElementById('options-box');
+        box.innerHTML = '';
+        choices.forEach(c => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-opt';
+            btn.innerHTML = `<strong>${c.r}</strong><br><span style="font-size:11px; opacity: 0.8;">${c.m}</span>`;
+            btn.onclick = () => checkAnswer(c === curTarget);
+            box.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(correct) {
+        if(correct) {
+            playSound('coin');
+            coins += 10;
+            score += 1;
+            updateStats();
+            nextCustomer();
+        } else {
+            playSound('error');
+            showHint();
+        }
+    }
+
+    function showHint() {
+        document.getElementById('hint-k-display').innerText = curTarget.k;
+        document.getElementById('hint-reading').innerText = `[${curTarget.r}] - ${curTarget.m}`;
+        document.getElementById('hint-decomp-text').innerText = `ခွဲခြားပုံ: ${curTarget.decomp || 'အစိတ်အပိုင်း စာလုံးများ'}`;
+        document.getElementById('hint-story-text').innerText = `မှတ်နည်း: ${curTarget.story || 'အသံထွက်နှင့် အဓိပ္ပာယ်ကို တွဲဖက်မှတ်သားပါ'}`;
+        document.getElementById('hint-modal').style.display = 'block';
+    }
+
+    function closeHint() {
+        document.getElementById('hint-modal').style.display = 'none';
+        nextCustomer();
+    }
+
+    function updateStats() {
+        document.getElementById('coin-val').innerText = coins;
+        document.getElementById('score-val').innerText = score;
+        
+        let lvl = "အစပြုဆိုင်";
+        if(score >= 10) lvl = "နာမည်ကြီးကဖီး";
+        if(score >= 25) lvl = "ဇိမ်ခံကဖီးဆိုင်";
+        if(score >= 50) lvl = "မာစတာကဖီးဆိုင်";
+        document.getElementById('level-name').innerText = lvl;
+    }
+
+    function toggleDict() {
+        const modal = document.getElementById('dict-modal');
+        if(modal.style.display === 'block') {
+            modal.style.display = 'none';
+        } else {
+            modal.style.display = 'block';
+            renderDict();
+        }
+    }
+
+    function renderDict() {
+        const query = document.getElementById('dict-search-input').value.toLowerCase();
+        const list = document.getElementById('dict-list');
+        list.innerHTML = '';
+        
+        const filtered = masterDb.filter(item => 
+            item.k.includes(query) || 
+            item.r.toLowerCase().includes(query) || 
+            item.m.toLowerCase().includes(query)
+        );
+
+        filtered.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'vocab-row';
+            div.innerHTML = `
+                <div>
+                    <strong>${item.k}</strong> (${item.r}) 
+                    <span class="vocab-badge">${item.l}</span>
+                    <span class="vocab-badge" style="background:#e3d5ca;">${item.type === 'SINGLE' ? 'တစ်လုံး' : 'တွဲလုံး'}</span>
+                </div>
+                <div style="color: #ffd166;">${item.m}</div>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    document.getElementById('total-dict-count').innerText = masterDb.length;
+    nextCustomer();
+</script>
+</body>
+</html>
